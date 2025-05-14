@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejemplo de Sensores por Yeffrimic</title>
+  <style>
+    body {
+      background: #aaaaaa;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #ec407a;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      width: 300px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .icon {
+      font-size: 60px;
+    }
+
+    .value {
+      font-size: 2em;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌸 Ejemplo de Sensores por Yeffrimic 🌸</h1>
+
+  <div class="card">
+    <div class="icon">🌡️</div>
+    <div class="value" id="temp">Temperatura: -- °C</div>
+  </div>
+
+  <div class="card">
+    <div class="icon">💧</div>
+    <div class="value" id="hum">Humedad: -- %</div>
+  </div>
+
+  <footer>
+    MQTT Topic: <code>esp8266/dht22</code>
+  </footer>
+
+  <!-- MQTT over WebSockets -->
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script>
+    const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+
+    client.on("connect", function () {
+      console.log("Conectado a MQTT");
+      client.subscribe("esp8266/dht22");
+    });
+
+    client.on("message", function (topic, message) {
+      try {
+        const data = JSON.parse(message.toString());
+        if (data.temperatura !== undefined && data.humedad !== undefined) {
+          document.getElementById("temp").textContent = `Temperatura: ${data.temperatura} °C`;
+          document.getElementById("hum").textContent = `Humedad: ${data.humedad} %`;
+        }
+      } catch (e) {
+        console.error("Error al parsear JSON:", e);
+      }
+    });
+  </script>
+</body>
+</html>
